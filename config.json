@@ -1,0 +1,11 @@
+{
+  "port": 8080,
+  "sites": [
+    {
+      "host": "mysite.com",
+      "routes": [
+        { "match": "/", "root": "/var/www/mysite" }
+      ]
+    }
+  ]
+}
