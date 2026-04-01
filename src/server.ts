@@ -2,8 +2,7 @@ import net from 'net';
 import fs from 'fs/promises'; 
 import path from 'path';
 import { Buffer } from 'buffer';
-import process = require('process');
-
+import parseHttpRequest from './parser';
 
 const ROOT_DIR = process.cwd();
 
@@ -46,7 +45,7 @@ async function loadConfig(): Promise<Config> {
     return config;
 
   } catch (err: any) {
-    console.error('❌ Failed to load config.json');
+    console.error(' Failed to load config.json');
     console.error(`Make sure you have a file named 'config.json' in this folder:`);
     console.error(`→ ${ROOT_DIR}`);
     throw err;
@@ -67,12 +66,28 @@ const server = net.createServer( async (socket: net.Socket) => {
 
 
     socket.on('data', (data: Buffer) => {
+
+      const req = parseHttpRequest(data);
+      console.log(req);
+
+      /*   console.log(data);
+        const headerEndIndex = data.indexOf('\r\n\r\n');
+        console.log(`index: ${headerEndIndex}`);
+        const header = data.subarray(0, headerEndIndex).toString();
+        console.log(`Headers from buffer: ${header}`);
+        console.log(`Remaining buffer`);
+        console.log(data);
+
         const requestData: string = data.toString();
         const requestLine: string  = requestData.split('\r\n')[0];
+        const requestBody: string  = requestData.split('\r\n')[1];
         const [method, path, protocol] = requestLine.split(' ');
         console.log(`Request Line: ${requestLine}`);
         console.log(`path: ${path}`);
         console.log(`Received data: ${requestData}`);
+        const [key, ...value] = requestBody.split(": ");
+        console.log(`Keys: ${key}`)
+        console.log(`values: ${value}`)
        // socket.write(`Echo: ${data.toString()}`);
        const html = `
         <h1>Hello from Raw TCP Server</h1>
@@ -87,7 +102,7 @@ const server = net.createServer( async (socket: net.Socket) => {
                         html;
 
         socket.write(response);
-        socket.end();
+        socket.end(); */
     });
     socket.on('end', () => {
         console.log('Client disconnected');
