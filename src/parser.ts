@@ -1,6 +1,9 @@
+import { parseUrl } from "./params.js";
+
 export type HttpRequest = {
     method: string;
-    url: string;
+    pathname: string;
+    query: Record<string, string>;
     version: string;
     headers: Record<string, string>;
     body: string;
@@ -26,19 +29,30 @@ function parseHttpRequest(data:Buffer): HttpRequest {
             headers[key.toLowerCase()] = value.join(": ");
         }
 
-        const contentLength: number = parseInt(headers["content-length"] || 0, 10);
+        const parsedUrl = parseUrl(url);
+
+        const contentLength: number = parseInt(headers["content-length"] , 10);
         const bodystart = headerEndIndex + 4;
         if (buffer.length < bodystart + contentLength)  break;
         const body = buffer.subarray(bodystart, bodystart + contentLength).toString();
 
         return {
             method: method || '',
-            url: url || '',
+            pathname: parsedUrl.pathname || '',
+            query: parsedUrl.query,
             version: version || '',
             headers,
             body
         };
     }
+    return {
+        method: '',
+        pathname: '',
+        query: {},
+        version: '',
+        headers: {},
+        body: ''
+    };
 }
 
 export default parseHttpRequest;
